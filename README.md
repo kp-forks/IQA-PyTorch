@@ -4,11 +4,13 @@ An IQA toolbox with pure python and pytorch. Please refer to [Awesome-Image-Qual
 
 <a href="https://colab.research.google.com/drive/14J3KoyrjJ6R531DsdOy5Bza5xfeMODi6?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a> 
 [![PyPI](https://img.shields.io/pypi/v/pyiqa)](https://pypi.org/project/pyiqa/)
-![visitors](https://visitor-badge.laobi.icu/badge?page_id=chaofengc/IQA-PyTorch) 
+[![Downloads](https://static.pepy.tech/badge/pyiqa)](https://pepy.tech/project/pyiqa)
 [![Documentation Status](https://readthedocs.org/projects/iqa-pytorch/badge/?version=latest)](https://iqa-pytorch.readthedocs.io/en/latest/?badge=latest)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/chaofengc/Awesome-Image-Quality-Assessment)
 [![Citation](https://img.shields.io/badge/Citation-bibtex-green)](https://github.com/chaofengc/IQA-PyTorch/blob/main/README.md#bookmark_tabs-citation)
 [![Zhihu](https://img.shields.io/badge/zhihu-white?logo=zhihu)](https://www.zhihu.com/column/c_1565424954811846656)
+
+<!-- [![visitors](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fchaofengc%2FIQA-PyTorch&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=visitors&edge_flat=false)](https://hits.seeyoufarm.com) -->
 
 ## :open_book: Introduction
 
@@ -23,6 +25,7 @@ This is a comprehensive image quality assessment (IQA) toolbox built with **pure
 ---
 
 ### :triangular_flag_on_post: Updates/Changelog
+- 🎨**Oct, 2024**. Add perceptual color difference metric `msswd` proposed in [MS-SWD (ECCV2024)](https://github.com/real-hjq/MS-SWD). Thanks to their work! 🤗
 - ⏳**Sep, 2024**. Add [efficiency benchmark](tests/Efficiency_benchmark.csv). With $1080\times800$ image as inputs, all metrics complete **in under 1 second on the GPU** (NVIDIA V100), and most of them, except for `qalign` and `qalign_8bit`, require **less than 6GB of GPU memory**.
 - ⚡**Aug, 2024**. Add `qalign_4bit` and `qalign_8bit` with much less memory requirement and similar performance.
 - ✨**Aug, 2024**. Add `piqe` metric, and `niqe_matlab, brisque_matlab` with default matlab parameters (results have been calibrated with MATLAB R2021b).
@@ -136,12 +139,11 @@ Please refer to the [results calibration](./ResultsCalibra/ResultsCalibra.md) to
 
 ### ⏬ Download Benchmark Datasets
 
-For convenience, we upload all related datasets to [huggingface](https://huggingface.co/datasets/chaofengc/IQA-Toolbox-Datasets/tree/main). 
-Here are example codes to download datasets from huggingface:
+For convenience, we upload all related datasets to [huggingface IQA-Toolbox-Dataset](https://huggingface.co/datasets/chaofengc/IQA-Toolbox-Datasets), and corresponding meta information files to [huggingface IQA-Toolbox-Dataset-metainfo](https://huggingface.co/datasets/chaofengc/IQA-Toolbox-Datasets-metainfo). 
+Here are example codes to download them from huggingface:
 
 >[!CAUTION]
 > we only collect the datasets for academic, research, and educational purposes. It is important for the users to adhere to the usage guidelines, licensing terms, and conditions set forth by the original creators or owners of each dataset.
-
 
 ```python
 import os
@@ -150,10 +152,19 @@ from huggingface_hub import snapshot_download
 save_dir = './datasets'
 os.makedirs(save_dir, exist_ok=True)
 
-filename = "meta_info.tgz"
+filename = "koniq10k.tgz"
 snapshot_download("chaofengc/IQA-Toolbox-Datasets", repo_type="dataset", local_dir=save_dir, allow_patterns=filename, local_dir_use_symlinks=False)
 
 os.system(f"tar -xzvf {save_dir}/{filename} -C {save_dir}")
+```
+
+Download meta information from Huggingface with `git clone` or update with `git pull`:
+```
+cd ./datasets
+git clone https://huggingface.co/datasets/chaofengc/IQA-Toolbox-Datasets-metainfo meta_info
+
+cd ./datasets/meta_info
+git pull
 ```
 
 Examples to specific dataset options can be found in `./options/default_dataset_opt.yml`. Details of the dataloader interface and meta information files can be found in [Dataset Preparation](docs/Dataset_Preparation.md)
