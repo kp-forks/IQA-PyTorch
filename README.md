@@ -18,9 +18,14 @@ This is a comprehensive image quality assessment (IQA) toolbox built with **pure
 
 <div align="center">
 
-📦 [Model Cards](docs/ModelCard.md)  |  🗃️ [Dataset Cards](docs/Dataset_Preparation.md) | 🤗 [Datasets Download](https://huggingface.co/datasets/chaofengc/IQA-Toolbox-Datasets/tree/main) | 📚 [Documentation](https://iqa-pytorch.readthedocs.io/en/latest/) | 📈[Benchmark](https://github.com/chaofengc/IQA-PyTorch/tree/main?tab=readme-ov-file#performance-evaluation-protocol)
+📦 [Model Cards](docs/ModelCard.md)  |  🗃️ [Dataset Cards](docs/Dataset_Preparation.md) | 📚 [Documentation](https://iqa-pytorch.readthedocs.io/en/latest/) | 📈[Benchmark](https://github.com/chaofengc/IQA-PyTorch/tree/main?tab=readme-ov-file#performance-evaluation-protocol)
+<br>
+🤗 [Datasets Download](https://huggingface.co/datasets/chaofengc/IQA-Toolbox-Datasets/tree/main) [(HF Mirror)](https://hf-mirror.com/datasets/chaofengc/IQA-PyTorch-Datasets) | [Model Download](https://huggingface.co/chaofengc/IQA-PyTorch-Weights) [(HF Mirror)](https://hf-mirror.com/chaofengc/IQA-PyTorch-Weights)
 
 </div>
+
+> Note: If you cannot access Hugging Face, try the mirror site [hf-mirror.com](https://hf-mirror.com/) to download datasets and model weights.  
+> 注意：无法访问 Hugging Face 时，可尝试使用镜像网站 [hf-mirror.com](https://hf-mirror.com/) 下载数据集和模型权重。
 
 ---
 
@@ -30,10 +35,6 @@ This is a comprehensive image quality assessment (IQA) toolbox built with **pure
 - 🎉**Sep, 2025**. Add `afine` metric proposed in [AFINE](https://github.com/ChrisDud0257/AFINE). Thanks to [Du CHEN](https://github.com/ChrisDud0257) for their great work 🤗, and please refer to their official papers for more details! 
 - 🎉**Jun, 2025**. Add `sfid`, a commonly used metric in generative models.
 - 🎆**Jan, 2025**. Add `qualiclip`, `qualiclip+` and its variances trained on different datasets, refer to official repo [here](https://github.com/miccunifi/QualiCLIP). Thanks for the contribution from [Lorenzo Agnolucci](https://github.com/LorenzoAgnolucci) 🤗.
-- 🪐**Dec, 2024**. Add `fid` with MMD distance, use it with `fid_metric(..., distance_type='mmd', kernel_type='rbf')`refer to [cmmd](https://github.com/google-research/google-research/tree/master/cmmd) for more details. Thanks to [Ina](https://github.com/Luciennnnnnn) for the contributions.
-- 🌕**Dec, 2024**. Add `fid_dinov2`, refer to [dgm-eval](https://github.com/layer6ai-labs/dgm-eval) for more details. 
-- 💫**Nov, 2024**. Add `pyiqa.load_dataset` for easy loading of several common datasets. 
-- 🌟**Nov, 2024**. Add `compare2score` and `deepdc`. Thanks to [hanwei](https://github.com/h4nwei) for their great work 🤗, and please refer to their official papers for more details! 
 - [**More**](docs/history_changelog.md)
 
 ---

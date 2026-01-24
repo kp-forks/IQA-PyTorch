@@ -1,6 +1,13 @@
 # History of Changelog
-- 👉**Dec, 2025**.Add FR-IQA method `dmm` proposed in [paper](https://github.com/Baoliang93/DMM), with SVD-based debiased mapping to mitigate perception bias. 
-- 💥**Dec, 2025**.Add `maclip` proposed in [MACLIP](https://github.com/zhix000/MA-CLIP), introducing magnitude in IQA. Refer to their official papers for more details! 
+- 👉**Dec, 2025**.Add FR-IQA method `dmm` proposed in [paper](https://ieeexplore.ieee.org/abstract/document/10886996), with SVD-based debiased mapping to mitigate perception bias. Thanks to [baoliang](https://github.com/Baoliang93) for their great work 🤗, refer to DMM for more details.
+- ✨**Dec, 2025**. Add `maclip` metric proposed in [MACLIP](https://github.com/zhix000/MA-CLIP), introducing magnitude in IQA. Thanks to [zhicheng](https://github.com/zhix000) for their contribution 🤗, and please refer to their official papers for more details! 
+- 🎉**Sep, 2025**. Add `afine` metric proposed in [AFINE](https://github.com/ChrisDud0257/AFINE). Thanks to [Du CHEN](https://github.com/ChrisDud0257) for their great work 🤗, and please refer to their official papers for more details! 
+- 🎉**Jun, 2025**. Add `sfid`, a commonly used metric in generative models.
+- 🎆**Jan, 2025**. Add `qualiclip`, `qualiclip+` and its variances trained on different datasets, refer to official repo [here](https://github.com/miccunifi/QualiCLIP). Thanks for the contribution from [Lorenzo Agnolucci](https://github.com/LorenzoAgnolucci) 🤗.
+- 🪐**Dec, 2024**. Add `fid` with MMD distance, use it with `fid_metric(..., distance_type='mmd', kernel_type='rbf')`refer to [cmmd](https://github.com/google-research/google-research/tree/master/cmmd) for more details. Thanks to [Ina](https://github.com/Luciennnnnnn) for the contributions.
+- 🌕**Dec, 2024**. Add `fid_dinov2`, refer to [dgm-eval](https://github.com/layer6ai-labs/dgm-eval) for more details. 
+- 💫**Nov, 2024**. Add `pyiqa.load_dataset` for easy loading of several common datasets. 
+- 🌟**Nov, 2024**. Add `compare2score` and `deepdc`. Thanks to [hanwei](https://github.com/h4nwei) for their great work 🤗, and please refer to their official papers for more details!
 - 🚀**Oct, 2024**. Update `topiq_nr-face` by training with the [GCFIQA](https://github.com/DSL-FIQA/DSL-FIQA) dataset. Thanks to their work! 🤗
 - 🎨**Oct, 2024**. Add perceptual color difference metric `msswd` proposed in [MS-SWD (ECCV2024)](https://github.com/real-hjq/MS-SWD). Thanks to their work! 🤗
 - ⏳**Sep, 2024**. Add [efficiency benchmark](tests/Efficiency_benchmark.csv). With $1080\times800$ image as inputs, all metrics complete **in under 1 second on the GPU** (NVIDIA V100), and most of them, except for `qalign` and `qalign_8bit`, require **less than 6GB of GPU memory**.
