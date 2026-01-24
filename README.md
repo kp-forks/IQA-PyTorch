@@ -25,7 +25,7 @@ This is a comprehensive image quality assessment (IQA) toolbox built with **pure
 </div>
 
 > Note: If you cannot access Hugging Face, try the mirror site [hf-mirror.com](https://hf-mirror.com/) to download datasets and models.  
-> 注意：无法访问 Hugging Face 时，可尝试使用镜像网站 [hf-mirror.com](https://hf-mirror.com/) 下载数据集和模型权重。
+> 注意：无法访问 Hugging Face 时，可尝试使用镜像网站 [hf-mirror.com](https://hf-mirror.com/) 下载数据集和模型权重。设置环境变量`export HF_ENDPOINT=https://hf-mirror.com`。
 
 ---
 
