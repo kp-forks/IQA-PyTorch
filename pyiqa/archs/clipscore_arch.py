@@ -15,7 +15,7 @@ Re-implemented by: Chaofeng Chen (https://github.com/chaofengc)
 import torch
 import torch.nn as nn
 
-import clip
+from .clip_imports import clip
 from pyiqa.utils.registry import ARCH_REGISTRY
 from .arch_util import clip_preprocess_tensor
 
@@ -29,7 +29,7 @@ class CLIPScore(nn.Module):
 
     .. math::
 
-        s = w \cdot \max(\cos(f_{img}, f_{txt}), 0)
+        s = w \\cdot \\max(\\cos(f_{img}, f_{txt}), 0)
 
     Args:
         backbone (str): CLIP backbone name accepted by :mod:`clip`, for example

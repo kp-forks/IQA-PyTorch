@@ -5,7 +5,7 @@ Introduced by: https://github.com/christophschuhmann/improved-aesthetic-predicto
 
 import torch.nn as nn
 
-import clip
+from .clip_imports import clip
 from pyiqa.utils.registry import ARCH_REGISTRY
 from pyiqa.archs.arch_util import load_pretrained_network, clip_preprocess_tensor
 

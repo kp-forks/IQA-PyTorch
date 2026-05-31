@@ -23,7 +23,7 @@ from pyiqa.utils.registry import ARCH_REGISTRY
 from pyiqa.utils.download_util import DEFAULT_CACHE_DIR
 from pyiqa.archs.arch_util import load_pretrained_network
 
-import clip
+from .clip_imports import clip
 from .clip_model import load
 import torch.nn.functional as F
 from itertools import product

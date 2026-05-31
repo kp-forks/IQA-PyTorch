@@ -11,7 +11,7 @@ from torchvision import models
 from PIL import Image
 
 from pyiqa.utils.registry import ARCH_REGISTRY
-from pyiqa.archs.arch_util import load_pretrained_network, get_url_from_name
+from pyiqa.archs.arch_util import load_pretrained_network, get_url_from_name, load_file_from_url
 
 default_model_urls = {
     'meta-train-seed': get_url_from_name('Metaiqa_prior.pth'),
@@ -73,7 +73,8 @@ class MetaIQA(nn.Module):
             )
 
             if is_inference_env:
-                ckpt_path = default_model_urls['meta-infer-ready']
+                ckpt_path = load_file_from_url(default_model_urls['meta-infer-ready'])
+                print(f'Loading pretrained model from {ckpt_path} for inference...')
                 state_dict = torch.load(ckpt_path, map_location='cpu')
                 if 'params' in state_dict:
                     state_dict = state_dict['params']
@@ -85,30 +86,18 @@ class MetaIQA(nn.Module):
                     new_k = k.replace('net_g.', '').replace('module.', '').replace('net.', 'head.')
                     clean_dict[new_k] = v
 
-
-                load_result = self.load_state_dict(clean_dict, strict=False)
-
-
+                self.load_state_dict(clean_dict, strict=False)
             else:
                 load_pretrained_network(self, default_model_urls['meta-train-seed'], strict=False, weight_keys=None)
 
     def preprocess(self, x):
-        x = x[:, [2, 1, 0], :, :]
         if x.shape[2:] != (224, 224):
             x = nn.functional.interpolate(x, size=(224, 224), mode='bilinear', align_corners=False)
         x = (x - self.mean) / self.std
         return x
 
     def forward(self, x, ref=None):
-        if isinstance(x, str):
-            import torchvision.transforms.functional as F
-            img = Image.open(x).convert('RGB')
-            img = img.resize((224, 224), Image.BILINEAR)
-            x = F.to_tensor(img).unsqueeze(0).to(self.mean.device)
-            x = x * 255.0
-            x = (x - self.mean) / self.std
-        else:
-            x = self.preprocess(x)
+        x = self.preprocess(x)
 
         feat = self.resnet_layer(x)
         score = self.head(feat)

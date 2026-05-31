@@ -16,7 +16,6 @@ Reference:
 
 import torch
 import torch.nn as nn
-import clip
 import torch.nn.functional as F
 from torchvision.transforms import Normalize
 import torchvision
@@ -24,6 +23,7 @@ import torchvision
 from pyiqa.utils.registry import ARCH_REGISTRY
 from pyiqa.archs.constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD
 from pyiqa.archs.clip_model import load
+from pyiqa.archs.clip_imports import clip
 
 
 class CustomCLIP(nn.Module):
