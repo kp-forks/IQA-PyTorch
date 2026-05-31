@@ -66,13 +66,12 @@ class MetaIQA(nn.Module):
             load_pretrained_network(self, pretrained_model_path, strict=False, weight_keys=None)
         elif pretrained:
             main_script = os.path.basename(sys.argv[0])
-            is_inference_env = (
-                    'inference_iqa.py' in main_script or
-                    'test.py' in main_script or
-                    'benchmark_results.py' in main_script
+            is_train_env = (
+                    'train.py' in main_script or
+                    'train_nsplits.py' in main_script
             )
 
-            if is_inference_env:
+            if not is_train_env:
                 ckpt_path = load_file_from_url(default_model_urls['meta-infer-ready'])
                 print(f'Loading pretrained model from {ckpt_path} for inference...')
                 state_dict = torch.load(ckpt_path, map_location='cpu')
