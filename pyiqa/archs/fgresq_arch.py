@@ -10,11 +10,13 @@ Reference URL:
 """
 
 import warnings
+from copy import deepcopy
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from transformers import CLIPVisionModel
+from transformers import logging as hf_logging
 from torchvision.transforms import functional as TF
 
 from pyiqa.archs.arch_util import clean_state_dict, get_url_from_name
@@ -115,8 +117,12 @@ class FGResQ(nn.Module):
         self.resize_size = resize_size
         self.score_scale = score_scale
 
-        self.clip_model = CLIPVisionModel.from_pretrained(clip_model)
-        self.task_cls_clip = CLIPVisionModel.from_pretrained(task_clip_model)
+        self.clip_model = self._load_clip_vision_model(clip_model)
+        if task_clip_model == clip_model:
+            # Avoid re-loading the same checkpoint twice.
+            self.task_cls_clip = deepcopy(self.clip_model)
+        else:
+            self.task_cls_clip = self._load_clip_vision_model(task_clip_model)
 
         hidden_size = self.clip_model.config.hidden_size
         task_hidden_size = self.task_cls_clip.config.hidden_size
@@ -155,8 +161,8 @@ class FGResQ(nn.Module):
             for param in layer.parameters():
                 param.requires_grad = True
 
-        self.default_mean = torch.Tensor(default_mean).view(1, 3, 1, 1)
-        self.default_std = torch.Tensor(default_std).view(1, 3, 1, 1)
+        self.register_buffer('default_mean', torch.tensor(default_mean).view(1, 3, 1, 1))
+        self.register_buffer('default_std', torch.tensor(default_std).view(1, 3, 1, 1))
 
         if degradation_model_path is not None:
             self.load_degradation_weights(degradation_model_path)
@@ -170,6 +176,62 @@ class FGResQ(nn.Module):
         elif pretrained:
             self.load_pretrained_weights(load_file_from_url(default_model_urls['fgresq']))
 
+    @staticmethod
+    def _load_clip_vision_model(model_name):
+        """Load CLIP vision weights without verbose task-mismatch reports.
+
+        CLIP vision backbones are often loaded from full CLIP checkpoints that
+        also contain text-branch keys. These are expected to be unused.
+        """
+        previous_verbosity = hf_logging.get_verbosity()
+        hf_logging.set_verbosity_error()
+        try:
+            return CLIPVisionModel.from_pretrained(model_name)
+        finally:
+            hf_logging.set_verbosity(previous_verbosity)
+
+    @staticmethod
+    def _summarize_keys(keys, max_items=8):
+        if not keys:
+            return '[]'
+        keys = list(keys)
+        head = ', '.join(keys[:max_items])
+        if len(keys) > max_items:
+            return f'[{head}, ...] (total={len(keys)})'
+        return f'[{head}]'
+
+    @staticmethod
+    def _extract_vision_state_dict(state_dict):
+        """Extract CLIP vision-only keys from mixed checkpoints."""
+        clip_prefixed = {
+            key.replace('clip_model.', '', 1): value
+            for key, value in state_dict.items()
+            if key.startswith('clip_model.')
+        }
+        candidate = clip_prefixed if clip_prefixed else state_dict
+        vision_only = {
+            key: value
+            for key, value in candidate.items()
+            if key.startswith('vision_model.')
+        }
+        return vision_only if vision_only else candidate
+
+    @staticmethod
+    def _filter_expected_missing_keys(missing):
+        expected_missing = {'default_mean', 'default_std'}
+        return [key for key in missing if key not in expected_missing]
+
+    def _warn_load_mismatch(self, name, missing, unexpected):
+        missing = self._filter_expected_missing_keys(missing)
+        if not missing and not unexpected:
+            return
+        warnings.warn(
+            f'{name} loaded with '
+            f'missing={len(missing)} {self._summarize_keys(missing)}; '
+            f'unexpected={len(unexpected)} {self._summarize_keys(unexpected)}',
+            RuntimeWarning,
+        )
+
     def load_degradation_weights(self, model_path):
         """Load degradation-branch weights.
 
@@ -177,24 +239,13 @@ class FGResQ(nn.Module):
             model_path (str): Path to the degradation checkpoint.
         """
         state_dict = load_checkpoint(model_path)
-        clip_state_dict = {
-            key.replace('clip_model.', '', 1): value
-            for key, value in state_dict.items()
-            if key.startswith('clip_model.')
-        }
-        if not clip_state_dict:
-            clip_state_dict = state_dict
+        clip_state_dict = self._extract_vision_state_dict(state_dict)
 
         missing, unexpected = self.task_cls_clip.load_state_dict(
             clip_state_dict,
             strict=False,
         )
-        if missing or unexpected:
-            warnings.warn(
-                f'FGResQ degradation weights loaded with missing={missing}, '
-                f'unexpected={unexpected}',
-                RuntimeWarning,
-            )
+        self._warn_load_mismatch('FGResQ degradation weights', missing, unexpected)
 
     def load_pretrained_weights(self, model_path):
         """Load main FGResQ weights.
@@ -204,11 +255,7 @@ class FGResQ(nn.Module):
         """
         state_dict = load_checkpoint(model_path)
         missing, unexpected = self.load_state_dict(state_dict, strict=False)
-        if missing or unexpected:
-            warnings.warn(
-                f'FGResQ weights loaded with missing={missing}, unexpected={unexpected}',
-                RuntimeWarning,
-            )
+        self._warn_load_mismatch('FGResQ weights', missing, unexpected)
 
     def preprocess(self, x):
         """Preprocess an input image tensor.
@@ -237,7 +284,7 @@ class FGResQ(nn.Module):
             align_corners=False,
         )
         x = TF.center_crop(x, self.input_size)
-        x = (x - self.default_mean.to(x)) / self.default_std.to(x)
+        x = (x - self.default_mean) / self.default_std
         return x
 
     def get_quality_features(self, x):
