@@ -20,6 +20,11 @@ from collections import OrderedDict
 import torch.nn.functional as F
 from pyiqa.utils.registry import ARCH_REGISTRY
 
+try:
+    from torchvision.models import VGG16_Weights
+except ImportError:
+    VGG16_Weights = None
+
 #----------------------- VGGNet-----------------------------------
 names = {'vgg16': ['conv1_1', 'relu1_1', 'conv1_2', 'relu1_2', 'pool1',
                    'conv2_1', 'relu2_1', 'conv2_2', 'relu2_2', 'pool2',
@@ -46,7 +51,10 @@ class FeaturesExtractor(nn.Module):
         self.use_input_norm = use_input_norm
         self.target_features = target_features
 
-        model = torchvision.models.vgg16(pretrained=True)
+        if VGG16_Weights is not None:
+            model = torchvision.models.vgg16(weights=VGG16_Weights.IMAGENET1K_V1)
+        else:
+            model = torchvision.models.vgg16(pretrained=True)
         names_key = 'vgg16'
 
         if replace_pooling:

@@ -74,9 +74,9 @@ def test_match_official_with_given_cases(ref_img, dist_img, metric_name, device)
 
     # save results
     cal_sum = pd.read_csv(CALBR_SUMMARY_FILE, index_col='Method')
-    cal_sum.loc[metric_name] = [f'{item:.4f}' for item in official_result.tolist()]
+    cal_sum.loc[metric_name] = [round(float(item), 4) for item in official_result.tolist()]
     cal_sum.loc[metric_name + '(ours)'] = [
-        f'{item:.4f}' for item in score.squeeze().cpu().numpy().tolist()
+        round(float(item), 4) for item in score.squeeze().cpu().numpy().tolist()
     ]
     cal_sum = cal_sum.sort_values(by=['Method'], ascending=True)
     cal_sum.to_csv(CALBR_SUMMARY_FILE)

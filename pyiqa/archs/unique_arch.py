@@ -22,6 +22,11 @@ from pyiqa.utils.registry import ARCH_REGISTRY
 from pyiqa.archs.arch_util import load_pretrained_network
 from pyiqa.archs.arch_util import get_url_from_name
 
+try:
+    from torchvision.models import ResNet34_Weights
+except ImportError:
+    ResNet34_Weights = None
+
 default_model_urls = {
     'mix': get_url_from_name('UNIQUE.pt'),
 }
@@ -85,7 +90,12 @@ class UNIQUE(nn.Module):
     def __init__(self):
         super(UNIQUE, self).__init__()
 
-        self.backbone = torchvision.models.resnet34(pretrained=True)
+        if ResNet34_Weights is not None:
+            self.backbone = torchvision.models.resnet34(
+                weights=ResNet34_Weights.IMAGENET1K_V1
+            )
+        else:
+            self.backbone = torchvision.models.resnet34(pretrained=True)
         outdim = 2
         self.representation = BCNN()
         self.fc = nn.Linear(512 * 512, outdim)

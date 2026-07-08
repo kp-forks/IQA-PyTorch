@@ -425,15 +425,28 @@ class CFANet(nn.Module):
         self.crops = num_crop
 
         if 'gfiqa' in model_name:
-            self.face_helper = FaceRestoreHelper(
-                1,
-                face_size=512,
-                crop_ratio=(1, 1),
-                det_model='retinaface_resnet50',
-                save_ext='png',
-                use_parse=True,
-                model_rootpath=DEFAULT_CACHE_DIR,
-            )
+            # facexlib still initializes RetinaFace via deprecated torchvision
+            # arguments on some versions; suppress only those known warnings.
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    'ignore',
+                    message="The parameter 'pretrained' is deprecated since 0\\.13 and may be removed in the future, please use 'weights' instead\\.",
+                    category=UserWarning,
+                )
+                warnings.filterwarnings(
+                    'ignore',
+                    message="Arguments other than a weight enum or `None` for 'weights' are deprecated since 0\\.13 and may be removed in the future\\.",
+                    category=UserWarning,
+                )
+                self.face_helper = FaceRestoreHelper(
+                    1,
+                    face_size=512,
+                    crop_ratio=(1, 1),
+                    det_model='retinaface_resnet50',
+                    save_ext='png',
+                    use_parse=True,
+                    model_rootpath=DEFAULT_CACHE_DIR,
+                )
 
     def _init_linear(self, m):
         for module in m.modules():
